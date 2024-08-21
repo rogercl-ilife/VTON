@@ -14,7 +14,7 @@ import math
 import argparse
 from matplotlib import pyplot as plt
 
-def get_mask_from_kps(kps,img_h=512,img_w=320):
+def get_mask_from_kps(kps,img_h=1024,img_w=768):
     rles = maskUtils.frPyObjects(kps, img_h, img_w)
     rle = maskUtils.merge(rles)
     mask = maskUtils.decode(rle)[...,np.newaxis].astype(np.float32)
@@ -66,8 +66,8 @@ def get_hand_mask(hand_keypoints):
     # bottom_mask = np.ones((256,192,1))
     # up_mask = np.ones((512,512,1))
     # bottom_mask = np.ones((512,512,1))
-    up_mask = np.ones((512,320,1))
-    bottom_mask = np.ones((512,320,1))
+    up_mask = np.ones((1024,768,1))
+    bottom_mask = np.ones((1024,768,1))
     if s_c > 0.1 and e_c > 0.1:
         up_mask = get_rectangle_mask(s_x,s_y,e_x,e_y)
         kernel = np.ones((20,20),np.uint8)  
@@ -124,17 +124,23 @@ if __name__ == '__main__':
         p_names, c_names = [], []
         with open(os.path.join(MPV3D_root, data_mode + '.txt'), 'r') as f:
             for line in f.readlines():
+                print(line) 
                 p_name, c_name = line.strip().split()
                 p_names.append(p_name)
                 c_names.append(c_name)
 
         for i, imname in tqdm(enumerate(p_names)):
             cname = c_names[i]
-            cmname = cname.replace('.jpg','_mask.jpg')
+            #cmname = cname.replace('.jpg','_mask.jpg')
+            cmname = cname.replace('.jpg','.jpg')
             c_path = os.path.join(cloth_root, cname)
             cm_path = os.path.join(cloth_mask_root, cmname)
-            parsename = imname.replace('.png','_label.png')
+            #parsename = imname.replace('.png','_label.png')
+            parsename = imname.replace('.jpg','.png')
             parse_pth = os.path.join(parse_root, parsename)
+
+            #print(parse_root)
+            #print(parse_pth)
             
                     
             c = Image.open(c_path)
@@ -176,14 +182,14 @@ if __name__ == '__main__':
 
             # cloth alignment
             c = c.resize((int(c.size[0]*scale_factor), int(c.size[1]*scale_factor)), Image.BILINEAR)
-            blank_c = Image.fromarray(np.ones((512,320,3), np.uint8) * 255)
+            blank_c = Image.fromarray(np.ones((1024,768,3), np.uint8) * 255)
             blank_c.paste(c, (paste_x, paste_y))
             c = blank_c # PIL Image
             c.save(os.path.join(cloth_align_dst, cname))
 
             # cloth mask alignment
             cm = cm.resize((int(cm.size[0]*scale_factor), int(cm.size[1]*scale_factor)), Image.NEAREST)
-            blank_cm = Image.fromarray(np.zeros((512,320), np.uint8))
+            blank_cm = Image.fromarray(np.zeros((1024,768), np.uint8))
             blank_cm.paste(cm, (paste_x, paste_y))
             cm = blank_cm # PIL Image
             cm.save(os.path.join(clothmask_align_dst, cmname))

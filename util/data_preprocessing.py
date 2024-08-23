@@ -13,8 +13,9 @@ from tqdm import tqdm
 import math
 import argparse
 from matplotlib import pyplot as plt
+np.set_printoptions(threshold=np.inf)
 
-def get_mask_from_kps(kps,img_h=1024,img_w=768):
+def get_mask_from_kps(kps,img_h,img_w):
     rles = maskUtils.frPyObjects(kps, img_h, img_w)
     rle = maskUtils.merge(rles)
     mask = maskUtils.decode(rle)[...,np.newaxis].astype(np.float32)
@@ -23,7 +24,7 @@ def get_mask_from_kps(kps,img_h=1024,img_w=768):
     return mask
 
 
-def get_rectangle_mask(a,b,c,d):
+def get_rectangle_mask(a,b,c,d, img_h, img_w):
     x1 = a + (b-d)/4
     y1 = b + (c-a)/4
     x2 = a - (b-d)/4
@@ -51,7 +52,7 @@ def get_rectangle_mask(a,b,c,d):
         kps.extend([x4,y4,x3,y3])
 
     kps = np.array(kps).reshape(1,-1).tolist()
-    mask = get_mask_from_kps(kps)
+    mask = get_mask_from_kps(kps, img_h, img_w)
 
     return mask
 
@@ -66,15 +67,15 @@ def get_hand_mask(hand_keypoints):
     # bottom_mask = np.ones((256,192,1))
     # up_mask = np.ones((512,512,1))
     # bottom_mask = np.ones((512,512,1))
-    up_mask = np.ones((1024,768,1))
-    bottom_mask = np.ones((1024,768,1))
+    up_mask = np.ones((img_h,img_w,1))
+    bottom_mask = np.ones((img_h,img_w,1))
     if s_c > 0.1 and e_c > 0.1:
-        up_mask = get_rectangle_mask(s_x,s_y,e_x,e_y)
+        up_mask = get_rectangle_mask(s_x,s_y,e_x,e_y, img_h, img_w)
         kernel = np.ones((20,20),np.uint8)  
         up_mask = cv2.dilate(up_mask,kernel,iterations = 1)
         up_mask = (up_mask > 0).astype(np.float32)[...,np.newaxis]
     if e_c > 0.1 and w_c > 0.1:
-        bottom_mask = get_rectangle_mask(e_x,e_y,w_x,w_y)
+        bottom_mask = get_rectangle_mask(e_x,e_y,w_x,w_y, img_h, img_w)
         bottom_mask = (bottom_mask > 0).astype(np.float32)
 
     return up_mask, bottom_mask
@@ -90,45 +91,52 @@ def get_palm_mask(hand_mask, hand_up_mask, hand_bottom_mask):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--MPV3D_root', type=str, default='path/to/the/MPV3D/dataset',help='path to the MPV3D dataset')
+    parser.add_argument('--data_root', type=str, default='/covis/VTON/example1/train',help='path to the MPV3D dataset')
+    parser.add_argument('--img_h', type=int, default=1024,help='image height')
+    parser.add_argument('--img_w', type=int, default=768,help='image width')
     opt, _ = parser.parse_known_args()
 
-    MPV3D_root = opt.MPV3D_root
+    data_root = opt.data_root
+    img_h     = opt.img_h
+    img_w     = opt.img_w
 
     # source dirs
-    person_root = os.path.join(MPV3D_root, 'image')
-    pose_root = os.path.join(MPV3D_root, 'pose')
-    cloth_root= os.path.join(MPV3D_root, 'cloth')
-    cloth_mask_root = os.path.join(MPV3D_root, 'cloth-mask')
-    parse_root = os.path.join(MPV3D_root, 'image-parse')
+    person_root = os.path.join(data_root, 'image')
+    pose_root = os.path.join(data_root, 'pose')
+    cloth_root= os.path.join(data_root, 'cloth')
+    cloth_mask_root = os.path.join(data_root, 'cloth-mask')
+    parse_root = os.path.join(data_root, 'image-parse')
 
     # target dirs
-    palmrgb_dst = os.path.join(MPV3D_root, 'palm-rgb')
-    palmmask_dst = os.path.join(MPV3D_root, 'palm-mask')
-    gradient_dst = os.path.join(MPV3D_root, 'image-sobel')
+    palmrgb_dst = os.path.join(data_root, 'palm-rgb')
+    palmmask_dst = os.path.join(data_root, 'palm-mask')
+    gradient_dst = os.path.join(data_root, 'image-sobel')
     os.makedirs(palmrgb_dst, exist_ok=True)
     os.makedirs(palmmask_dst, exist_ok=True)
     os.makedirs(gradient_dst, exist_ok=True)
 
 
     # -------------------- Pre-Alignment ------------------------ #
-    data_modes = ['train_pairs','test_pairs']
+    #data_modes = ['train_pairs','test_pairs']
+    data_modes = ['pairs']
     for data_mode in data_modes:
         # target dirs
-        cloth_align_dst = os.path.join(MPV3D_root, 'aligned', data_mode, 'cloth')
-        clothmask_align_dst = os.path.join(MPV3D_root, 'aligned', data_mode, 'cloth-mask')
+        cloth_align_dst = os.path.join(data_root, 'aligned', data_mode, 'cloth')
+        clothmask_align_dst = os.path.join(data_root, 'aligned', data_mode, 'cloth-mask')
         os.makedirs(cloth_align_dst, exist_ok=True)
         os.makedirs(clothmask_align_dst, exist_ok=True)
 
         align_factor = 1.0
         p_names, c_names = [], []
-        with open(os.path.join(MPV3D_root, data_mode + '.txt'), 'r') as f:
+        with open(os.path.join(data_root, data_mode + '.txt'), 'r') as f:
             for line in f.readlines():
                 print(line) 
                 p_name, c_name = line.strip().split()
                 p_names.append(p_name)
                 c_names.append(c_name)
 
+        # -------------------- Cloth alignment ------------------------ #
+        #   Input : cloth, cloth-mask, image-parse
         for i, imname in tqdm(enumerate(p_names)):
             cname = c_names[i]
             #cmname = cname.replace('.jpg','_mask.jpg')
@@ -138,10 +146,6 @@ if __name__ == '__main__':
             #parsename = imname.replace('.png','_label.png')
             parsename = imname.replace('.jpg','.png')
             parse_pth = os.path.join(parse_root, parsename)
-
-            #print(parse_root)
-            #print(parse_pth)
-            
                     
             c = Image.open(c_path)
             cm = Image.open(cm_path)
@@ -150,9 +154,8 @@ if __name__ == '__main__':
             parse = Image.open(parse_pth)
             parse_array = np.array(parse)
             parse_roi = (parse_array == 14).astype(np.float32) + \
-                    (parse_array == 15).astype(np.float32) + \
-                    (parse_array == 5).astype(np.float32)
-            
+                        (parse_array == 15).astype(np.float32) + \
+                        (parse_array == 5).astype(np.float32)
 
             # flat-cloth forground & bbox
             c_fg = np.where(cm_array!=0)
@@ -182,14 +185,14 @@ if __name__ == '__main__':
 
             # cloth alignment
             c = c.resize((int(c.size[0]*scale_factor), int(c.size[1]*scale_factor)), Image.BILINEAR)
-            blank_c = Image.fromarray(np.ones((1024,768,3), np.uint8) * 255)
+            blank_c = Image.fromarray(np.ones((img_h,img_w,3), np.uint8) * 255)
             blank_c.paste(c, (paste_x, paste_y))
             c = blank_c # PIL Image
             c.save(os.path.join(cloth_align_dst, cname))
 
             # cloth mask alignment
             cm = cm.resize((int(cm.size[0]*scale_factor), int(cm.size[1]*scale_factor)), Image.NEAREST)
-            blank_cm = Image.fromarray(np.zeros((1024,768), np.uint8))
+            blank_cm = Image.fromarray(np.zeros((img_h,img_w), np.uint8))
             blank_cm.paste(cm, (paste_x, paste_y))
             cm = blank_cm # PIL Image
             cm.save(os.path.join(clothmask_align_dst, cmname))

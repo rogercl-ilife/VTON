@@ -102,10 +102,10 @@ if __name__ == '__main__':
 
     # source dirs
     person_root = os.path.join(data_root, 'image')
-    pose_root = os.path.join(data_root, 'pose')
+    pose_root = os.path.join(data_root, 'openpose_json')
     cloth_root= os.path.join(data_root, 'cloth')
     cloth_mask_root = os.path.join(data_root, 'cloth-mask')
-    parse_root = os.path.join(data_root, 'image-parse')
+    parse_root = os.path.join(data_root, 'image-parse-v3')
 
     # target dirs
     palmrgb_dst = os.path.join(data_root, 'palm-rgb')
@@ -145,6 +145,7 @@ if __name__ == '__main__':
             cm_path = os.path.join(cloth_mask_root, cmname)
             #parsename = imname.replace('.png','_label.png')
             parsename = imname.replace('.jpg','.png')
+
             parse_pth = os.path.join(parse_root, parsename)
                     
             c = Image.open(c_path)
@@ -204,8 +205,10 @@ if __name__ == '__main__':
     for person_name in tqdm(person_list):
         person_id = person_name.split('_')[0]
         person_path = os.path.join(person_root, person_name)
-        parsing_path = os.path.join(parse_root, person_name.replace('.png', '_label.png'))
-        keypoints_path = os.path.join(pose_root, person_name.replace('.png', '_keypoints.json'))
+        #parsing_path = os.path.join(parse_root, person_name.replace('.png', '_label.png'))
+        #keypoints_path = os.path.join(pose_root, person_name.replace('.png', '_keypoints.json'))
+        parsing_path = os.path.join(parse_root, person_name.replace('.jpg', '.png'))
+        keypoints_path = os.path.join(pose_root, person_name.replace('.jpg', '_keypoints.json'))
         palmrgb_outfn = os.path.join(palmrgb_dst, person_name.replace('whole_front.png','palm.png'))
         palmmask_outfn = os.path.join(palmmask_dst, person_name.replace('whole_front.png','palm_mask.png'))
 

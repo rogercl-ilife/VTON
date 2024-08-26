@@ -13,16 +13,21 @@ parse_roi = (parse_array == 14).astype(np.float32) + \
 
 | Part       | index | Part        | index |
 |------------|-------|------------ |-------| 
-| background |	0	   | neck	       | 10    |
-| hat        |  1	   | scarf	     | 11    |
-| hair       |  2	   | skirt	     | 12    |
-| -	         |  3	   | face	       | 13    |
-| sunglass   |  4	   | left arm    | 14    |
-| shirt	     |  5	   | right arm   | 15    | 
-| dress	     |  6	   | left leg	   | 16    |  
-| coats	     |  7	   | right leg   | 17    | 
-| -	         |  8	   | left shoe   | 18    | 
-| pant	     |  9	   | right shoe  | 19    | 
+| background |  0    | neck        | 10    |
+| hat        |  1    | scarf       | 11    |
+| hair       |  2    | skirt       | 12    |
+| -	 |  3    | face        | 13    |
+| sunglass   |  4    | left arm    | 14    |
+| shirt	 |  5    | right arm   | 15    | 
+| dress	 |  6    | left leg    | 16    |  
+| coats	 |  7    | right leg   | 17    | 
+| -	 |  8    | left shoe   | 18    | 
+| pant	 |  9    | right shoe  | 19    | 
+
+
+# Appling DensePose 
+* The steps are referred from [HR-VITON] (https://github.com/sangyun884/HR-VITON/issues/45)
+
 
 
 

@@ -9,7 +9,7 @@ parse_roi = (parse_array == 14).astype(np.float32) + \
             (parse_array == 5).astype(np.float32)
 ```
 
-* Parsing table could be found in [2D-Human-Parsing] (https://github.com/fyviezhao/2D-Human-Parsing)
+* Parsing table could be found in [2D-Human-Parsing](https://github.com/fyviezhao/2D-Human-Parsing)
 
 | Part       | index | Part        | index |
 |------------|-------|------------ |-------| 
@@ -26,7 +26,7 @@ parse_roi = (parse_array == 14).astype(np.float32) + \
 
 
 # Appling DensePose 
-* The steps are referred from [HR-VITON] (https://github.com/sangyun884/HR-VITON/issues/45)
+* The steps are referred from [HR-VITON](https://github.com/sangyun884/HR-VITON/issues/45)
 
 
 

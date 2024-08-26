@@ -200,6 +200,7 @@ if __name__ == '__main__':
     print(f'clothes pre-alignment done and saved to {cloth_align_dst}!')
 
 
+    '''
     # -------------------- Segment Palms ------------------------ #
     person_list = sorted([i for _,_,i in os.walk(person_root)][0])
     for person_name in tqdm(person_list):
@@ -254,6 +255,6 @@ if __name__ == '__main__':
         plt.imsave(gradientx_outfn, sobelx, cmap='gray')
         plt.imsave(gradienty_outfn, sobely, cmap='gray')
     print(f'Getting image sobel done and saving to {gradient_dst}!')
-
+    '''
 
     print('******Data preprocessing done!******')

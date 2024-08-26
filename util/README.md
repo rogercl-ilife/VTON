@@ -1,5 +1,5 @@
 
-# data_processing.py
+# Resizing cloth
 * The implementation of data_processing is based on codes repo [M3D-VTON](https://github.com/fyviezhao/M3D-VTON)
 
 Follwing parts are used to calculate roi.

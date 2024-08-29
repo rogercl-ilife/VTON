@@ -6,3 +6,4 @@
 - [ ] Cloth wrapping
 - [ ] Segmentation generation
 - [ ] Diffusion
+- [ ] Evaluation 

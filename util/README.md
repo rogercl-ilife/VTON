@@ -33,4 +33,14 @@ parse_roi = (parse_array == 14).astype(np.float32) + \
 
 
 # Acknowledgement and Citations
-* The implementation of data_processing is based on codes repo [M3D-VTON](https://github.com/fyviezhao/M3D-VTON)
+* The implementation of data_processing is based on codes repo [M3D-VTON](https://github.com/fyviezhao/M3D-VTON) <br />
+```
+   @InProceedings{M3D-VTON,
+    author    = {Zhao, Fuwei and Xie, Zhenyu and Kampffmeyer, Michael and Dong, Haoye and Han, Songfang and Zheng, Tianxiang and Zhang, Tao and Liang, Xiaodan},
+    title     = {M3D-VTON: A Monocular-to-3D Virtual Try-On Network},
+    booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+    month     = {October},
+    year      = {2021},
+    pages     = {13239-13249}
+}
+```

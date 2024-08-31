@@ -8,6 +8,6 @@
   - [ ] Run C-VTON's cloth warp
   - [ ] Run KGI's cloth warp
   - [ ] Work on my own cloth warp 
+- [ ] Evaluation 
 - [ ] Segmentation generation
 - [ ] Diffusion
-- [ ] Evaluation 

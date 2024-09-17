@@ -7,10 +7,11 @@
 - [ ] Cloth wrapping
   - [x] Run C-VTON's cloth warp
     - [x] Train 
-    - [ ] Test to check result
+    - [ ] Test : Generate all test results
     - [ ] Run tensorboard to check result
       - [ ]  ~~sudo docker run -it --gpus all -v  /home/rogercl/covis:/covis -p 6006:6006 --name tensorboard  cuda-11.2:v1~~
   - [ ] Run KGI's cloth warp
+    - [ ] Test : Generate all test results 
   - [ ] Work on my own cloth warp 
 - [ ] Evaluation 
 - [ ] Segmentation generation
